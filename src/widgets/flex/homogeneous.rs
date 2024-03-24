@@ -1,4 +1,4 @@
-use std::{marker::PhantomData, collections::HashSet};
+use std::{collections::HashSet, marker::PhantomData};
 
 use crate::{
     actual_widget::{animated::Animated, ActualWidget, ActualWidgetId, ActualWidgetIdMaker},
@@ -74,25 +74,20 @@ impl<Data, Child: Widget<Data>> Widget<Data> for Flex<Data, Child> {
 }
 impl<Data, Child: ActualWidget<Data>> ActualWidget<Data> for FlexActualWidget<Data, Child> {
     fn layout(&mut self, graphics_context: &graphics::GraphicsContext, sc: layout::SizeConstraints) {
-        // lay out fixed elements and count up total flex scaling factors
-        let mut total_flex_scale = 0.0;
-        let mut major_size_left = self.direction.take_major_component(sc.max);
-        for (settings, _, child) in &mut self.children {
-            _layout::first_phase_step(graphics_context, sc, self.direction, &mut total_flex_scale, &mut major_size_left, _layout::animated_settings(*settings), child);
-        }
-
-        // lay out all of the flex children
-        for (settings, _, child) in &mut self.children {
-            _layout::second_phase_step(graphics_context, sc, self.direction, total_flex_scale, major_size_left, _layout::animated_settings(*settings), child);
-        }
-
-        // assign each of the offsets and calcaulte own_size
-        let mut major_offset = 0.0;
-        let mut max_minor_size = 0.0;
-        for (_, offset, child) in &mut self.children {
-            *offset = _layout::third_phase_step(self.direction, &mut major_offset, &mut max_minor_size, child);
-        }
-        self.own_size = sc.clamp_size(self.direction.make_vector_in_direction(major_offset, max_minor_size));
+        let phase1_result = _layout::phase1(
+            graphics_context,
+            sc,
+            self.direction,
+            self.children.iter_mut().map(move |(settings, _, child)| (_layout::animated_settings(*settings), child as &mut dyn ActualWidget<Data>)),
+        );
+        _layout::phase2(
+            graphics_context,
+            sc,
+            self.direction,
+            phase1_result,
+            self.children.iter_mut().map(move |(settings, _, child)| (_layout::animated_settings(*settings), child as &mut dyn ActualWidget<Data>)),
+        );
+        self.own_size = _layout::phase3(sc, self.direction, self.children.iter_mut().map(move |(_, offset, child)| (offset, child as &mut dyn ActualWidget<Data>)));
     }
 
     fn draw(&self, graphics_context: &graphics::GraphicsContext, target: &mut dyn graphics::RenderTarget, top_left: graphics::Vector2f, hover: &HashSet<ActualWidgetId>) {

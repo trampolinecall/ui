@@ -7,12 +7,12 @@ pub mod homogeneous;
 pub mod _layout {
     // TODO: somehow figure out how to not make this need to be exported
     use crate::{
-        graphics::{self, GraphicsContext},
-        layout::SizeConstraints,
         actual_widget::{
             animated::{Animated, AnimatedValue, Lerpable},
             ActualWidget,
         },
+        graphics::{self, GraphicsContext},
+        layout::SizeConstraints,
         widgets::flex::{Direction, ItemSettings},
     };
 
@@ -25,51 +25,64 @@ pub mod _layout {
         }
     }
 
-    #[inline]
-    pub fn first_phase_step<Data>(
+    // phase 1 of flex layout: lay out fixed elements and count up total flex scaling factors
+    pub fn phase1<'w, 'o, 'c, 'p, Data: 'w>(
         graphics_context: &GraphicsContext,
         sc: SizeConstraints,
         direction: Direction,
-        total_flex_scale: &mut f32,
-        major_size_left: &mut f32,
-        item_settings: ItemSettings,
-        item: &mut impl ActualWidget<Data>,
-    ) {
-        match item_settings {
-            ItemSettings::Fixed => {
-                item.layout(graphics_context, sc.with_no_min());
-                *major_size_left -= direction.take_major_component(item.size());
-            }
-            ItemSettings::Flex(scale) => {
-                *total_flex_scale += scale;
-            }
+        items: impl Iterator<Item = (ItemSettings, &'w mut dyn ActualWidget<Data>)>,
+    ) -> (f32, f32) {
+        let mut total_flex_scale = 0.0;
+        let mut major_size_left = direction.take_major_component(sc.max);
+        for (settings, child) in items {
+            match settings {
+                ItemSettings::Fixed => {
+                    child.layout(graphics_context, sc.with_no_min());
+                    major_size_left -= direction.take_major_component(child.size());
+                }
+                ItemSettings::Flex(scale) => {
+                    total_flex_scale += scale;
+                }
+            };
         }
+        (total_flex_scale, major_size_left)
     }
 
-    #[inline]
-    pub fn second_phase_step<Data>(
+    // phase 2 of flex layout: lay out all of the flex children
+    pub fn phase2<'w, 'o, 'c, 'p, Data: 'w>(
         graphics_context: &GraphicsContext,
         sc: SizeConstraints,
         direction: Direction,
-        total_flex_scale: f32,
-        major_size_left: f32,
-        item_settings: ItemSettings,
-        item: &mut impl ActualWidget<Data>,
+        (total_flex_scale, major_size_left): (f32, f32), // phase 1 output
+        items: impl Iterator<Item = (ItemSettings, &'w mut dyn ActualWidget<Data>)>,
     ) {
-        if let ItemSettings::Flex(scale) = item_settings {
-            let child_sc =
-                SizeConstraints { min: graphics::Vector2f::new(0.0, 0.0), max: direction.make_vector_in_direction(scale / total_flex_scale * major_size_left, direction.take_minor_component(sc.max)) };
-            item.layout(graphics_context, child_sc);
+        for (settings, child) in items {
+            if let ItemSettings::Flex(scale) = settings {
+                let child_sc = SizeConstraints {
+                    min: graphics::Vector2f::new(0.0, 0.0),
+                    max: direction.make_vector_in_direction(scale / total_flex_scale * major_size_left, direction.take_minor_component(sc.max)),
+                };
+                child.layout(graphics_context, child_sc);
+            };
         }
     }
 
-    #[inline]
-    pub fn third_phase_step<Data>(direction: Direction, major_offset: &mut f32, max_minor_size: &mut f32, item: &impl ActualWidget<Data>) -> graphics::Vector2f {
-        let offset = direction.make_vector_in_direction(*major_offset, 0.0);
-        *major_offset += direction.take_major_component(item.size());
-        let item_minor_size = direction.take_minor_component(item.size());
-        *max_minor_size = if item_minor_size > *max_minor_size { item_minor_size } else { *max_minor_size };
-        offset
+    // phase 3 of flex layout: assign each of the offsets and calcaulte own_size
+    pub fn phase3<'w, 'o, 'c, 'p, Data: 'w>(
+        sc: SizeConstraints,
+        direction: Direction,
+        items: impl Iterator<Item = (&'o mut graphics::Vector2f, &'w mut dyn ActualWidget<Data>)>,
+    ) -> graphics::Vector2f {
+        let mut major_offset = 0.0;
+        let mut max_minor_size = 0.0;
+        for (offset, child) in items {
+            let calculated_offset = direction.make_vector_in_direction(major_offset, 0.0);
+            major_offset += direction.take_major_component(child.size());
+            let item_minor_size = direction.take_minor_component(child.size());
+            max_minor_size = if item_minor_size > max_minor_size { item_minor_size } else { max_minor_size };
+            *offset = calculated_offset;
+        }
+        sc.clamp_size(direction.make_vector_in_direction(major_offset, max_minor_size))
     }
 }
 

@@ -50,35 +50,9 @@ macro_rules! flex {
             #[allow(non_camel_case_types)]
             impl<Data, $($name: $crate::actual_widget::ActualWidget<Data>),*> $crate::actual_widget::ActualWidget<Data> for ContainerActualWidget<Data, $($name),*> {
                 fn layout(&mut self, graphics_context: &$crate::graphics::GraphicsContext, sc: $crate::layout::SizeConstraints) {
-                    // lay out fixed elements and count up total flex scaling factors
-                    let mut total_flex_scale = 0.0;
-                    let mut major_size_left = $direction.take_major_component(sc.max);
-                    $(
-                        {
-                            let (settings, _, ref mut child) = self.$name;
-                            $crate::widgets::flex::_layout::first_phase_step(graphics_context, sc, $direction, &mut total_flex_scale, &mut major_size_left, $crate::widgets::flex::_layout::animated_settings(settings), child);
-                        }
-                    )*
-
-                    // lay out all of the flex children
-                    $(
-                        {
-                            let (settings, _, ref mut child) = self.$name;
-                            $crate::widgets::flex::_layout::second_phase_step(graphics_context, sc, $direction, total_flex_scale, major_size_left, $crate::widgets::flex::_layout::animated_settings(settings), child);
-                        }
-                    )*
-
-                    // assign each of the offsets and calcaulte own_size
-                    let mut major_offset = 0.0;
-                    let mut max_minor_size = 0.0;
-                    $(
-                        #[allow(unused_assignments)]
-                        {
-                            let (_, ref mut offset, ref mut child) = self.$name;
-                            *offset = $crate::widgets::flex::_layout::third_phase_step($direction, &mut major_offset, &mut max_minor_size, child);
-                        }
-                    )*
-                    self.own_size = sc.clamp_size($direction.make_vector_in_direction(major_offset, max_minor_size));
+                    let phase1_result = $crate::widgets::flex::_layout::phase1(graphics_context, sc, $direction, [$(($crate::widgets::flex::_layout::animated_settings(self.$name.0), &mut self.$name.2 as &mut dyn $crate::actual_widget::ActualWidget<Data>)),*].into_iter());
+                    $crate::widgets::flex::_layout::phase2(graphics_context, sc, $direction, phase1_result, [$(($crate::widgets::flex::_layout::animated_settings(self.$name.0), &mut self.$name.2 as &mut dyn $crate::actual_widget::ActualWidget<Data>)),*].into_iter());
+                    self.own_size = $crate::widgets::flex::_layout::phase3(sc, $direction, [$((&mut self.$name.1, &mut self.$name.2 as &mut dyn $crate::actual_widget::ActualWidget<Data>)),*].into_iter());
                 }
 
                 fn draw(&self, graphics_context: &$crate::graphics::GraphicsContext, target: &mut dyn $crate::graphics::RenderTarget, top_left: $crate::graphics::Vector2f, hover: &::std::collections::HashSet<$crate::actual_widget::ActualWidgetId>) {
