@@ -5,7 +5,6 @@ pub mod fixed_amount;
 pub mod homogeneous;
 
 pub mod _layout {
-    // TODO: somehow figure out how to not make this need to be exported
     use crate::{
         actual_widget::{
             animated::{Animated, AnimatedValue, Lerpable},
