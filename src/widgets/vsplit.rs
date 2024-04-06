@@ -63,9 +63,9 @@ impl<Data, Left: ActualWidget<Data>, Right: ActualWidget<Data>> ActualWidget<Dat
         Box::new(self.left.find_hover(top_left, mouse).chain(self.right.find_hover(top_left + graphics::Vector2f::new(self.left.size().x, 0.0), mouse)))
     }
 
-    fn send_targeted_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: TargetedEvent) {
-        self.left.send_targeted_event(top_left, data, target, event);
-        self.right.send_targeted_event(top_left, data, target, event);
+    fn dispatch_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: TargetedEvent) {
+        self.left.dispatch_event(top_left, data, target, event);
+        self.right.dispatch_event(top_left, data, target, event);
     }
 
     fn targeted_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: TargetedEvent) {}

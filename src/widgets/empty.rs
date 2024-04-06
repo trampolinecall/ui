@@ -37,7 +37,7 @@ impl<Data> ActualWidget<Data> for EmptyActualWidget {
         self.size
     }
 
-    fn send_targeted_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: ActualWidgetId, _: event::TargetedEvent) {}
+    fn dispatch_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: ActualWidgetId, _: event::TargetedEvent) {}
     fn targeted_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: event::TargetedEvent) {}
     fn general_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: event::GeneralEvent) {}
 }

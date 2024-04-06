@@ -65,8 +65,8 @@ pub fn run<Model, ModelAsWidget: Widget<Model>>(window_name: &'static str, windo
                     let hovered: Vec<_> = actual_widget.find_hover(view_top_left, mouse_position).collect();
                     for (hovered, clicks_can_pass_through) in hovered {
                         match button {
-                            sfml::window::mouse::Button::Left => actual_widget.send_targeted_event(view_top_left, &mut model, hovered, TargetedEvent::LeftMouseDown(mouse_position)),
-                            sfml::window::mouse::Button::Right => actual_widget.send_targeted_event(view_top_left, &mut model, hovered, TargetedEvent::RightMouseDown(mouse_position)),
+                            sfml::window::mouse::Button::Left => actual_widget.dispatch_event(view_top_left, &mut model, hovered, TargetedEvent::LeftMouseDown(mouse_position)),
+                            sfml::window::mouse::Button::Right => actual_widget.dispatch_event(view_top_left, &mut model, hovered, TargetedEvent::RightMouseDown(mouse_position)),
                             _ => {}
                         }
                         if !clicks_can_pass_through {

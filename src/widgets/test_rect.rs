@@ -67,7 +67,7 @@ impl<Data> ActualWidget<Data> for TestRectActualWidget {
         self.layout_size
     }
 
-    fn send_targeted_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: TargetedEvent) {
+    fn dispatch_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: TargetedEvent) {
         if target == self.id {
             self.targeted_event(top_left, data, event);
         }

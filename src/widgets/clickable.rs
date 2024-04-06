@@ -93,15 +93,15 @@ impl<Data, NormalChild: ActualWidget<Data>, ChildOnClicked: ActualWidget<Data>, 
         }
     }
 
-    fn send_targeted_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: event::TargetedEvent) {
+    fn dispatch_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: event::TargetedEvent) {
         if target == self.id {
             self.targeted_event(top_left, data, event);
         }
 
         if self.clicked {
-            self.child_on_clicked.send_targeted_event(top_left, data, target, event);
+            self.child_on_clicked.dispatch_event(top_left, data, target, event);
         } else {
-            self.normal_child.send_targeted_event(top_left, data, target, event);
+            self.normal_child.dispatch_event(top_left, data, target, event);
         }
     }
 

@@ -55,8 +55,8 @@ impl<Data, Child: ActualWidget<Data>> ActualWidget<Data> for CenterActualWidget<
         self.size
     }
 
-    fn send_targeted_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: event::TargetedEvent) {
-        self.child.send_targeted_event(center(top_left, self.size, self.child.size()), data, target, event);
+    fn dispatch_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: event::TargetedEvent) {
+        self.child.dispatch_event(center(top_left, self.size, self.child.size()), data, target, event);
     }
 
     fn targeted_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: event::TargetedEvent) {}

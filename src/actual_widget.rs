@@ -30,7 +30,7 @@ pub trait ActualWidget<Data: ?Sized> {
 
     fn find_hover(&self, top_left: graphics::Vector2f, mouse: graphics::Vector2f) -> Box<dyn Iterator<Item = (ActualWidgetId, bool)> + '_>;
 
-    fn send_targeted_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: event::TargetedEvent);
+    fn dispatch_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: event::TargetedEvent);
     fn targeted_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, event: event::TargetedEvent);
     fn general_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, event: event::GeneralEvent);
 }

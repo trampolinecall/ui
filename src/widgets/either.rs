@@ -73,10 +73,10 @@ impl<Data, Left: ActualWidget<Data>, Right: ActualWidget<Data>> ActualWidget<Dat
         }
     }
 
-    fn send_targeted_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: TargetedEvent) {
+    fn dispatch_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: TargetedEvent) {
         match self {
-            EitherActualWidget::Left(l) => l.send_targeted_event(top_left, data, target, event),
-            EitherActualWidget::Right(r, _) => r.send_targeted_event(top_left, data, target, event),
+            EitherActualWidget::Left(l) => l.dispatch_event(top_left, data, target, event),
+            EitherActualWidget::Right(r, _) => r.dispatch_event(top_left, data, target, event),
         }
     }
 

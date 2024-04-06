@@ -69,7 +69,7 @@ impl<GetFont: Fn(&graphics::Fonts) -> &Font, Data> ActualWidget<Data> for LabelA
         self.size
     }
 
-    fn send_targeted_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: event::TargetedEvent) {
+    fn dispatch_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: event::TargetedEvent) {
         if target == self.id {
             self.targeted_event(top_left, data, event);
         }

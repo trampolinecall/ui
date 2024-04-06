@@ -104,9 +104,9 @@ impl<Data, Child: ActualWidget<Data>> ActualWidget<Data> for FlexActualWidget<Da
         self.own_size
     }
 
-    fn send_targeted_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: TargetedEvent) {
+    fn dispatch_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: TargetedEvent) {
         for (_, offset, child) in &mut self.children {
-            child.send_targeted_event(top_left + *offset, data, target, event);
+            child.dispatch_event(top_left + *offset, data, target, event);
         }
     }
 
