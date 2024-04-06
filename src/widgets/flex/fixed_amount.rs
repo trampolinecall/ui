@@ -80,9 +80,9 @@ macro_rules! flex {
                     self.own_size
                 }
 
-                fn send_targeted_event(&mut self, top_left: $crate::graphics::Vector2f, data: &mut Data, target: $crate::actual_widget::ActualWidgetId, event: $crate::event::TargetedEvent) {
+                fn dispatch_event(&mut self, top_left: $crate::graphics::Vector2f, data: &mut Data, target: $crate::actual_widget::ActualWidgetId, event: $crate::event::TargetedEvent) {
                     $(
-                        self.$name.2.send_targeted_event(top_left + self.$name.1, data, target, event);
+                        self.$name.2.dispatch_event(top_left + self.$name.1, data, target, event);
                     )*
                 }
 
