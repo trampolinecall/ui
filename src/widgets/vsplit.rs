@@ -65,10 +65,13 @@ impl<Data, Left: ActualWidget<Data>, Right: ActualWidget<Data>> ActualWidget<Dat
 
     fn dispatch_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: TargetedEvent) {
         self.left.dispatch_event(top_left, data, target, event);
-        self.right.dispatch_event(top_left, data, target, event);
+        self.right.dispatch_event(top_left + graphics::Vector2f::new(self.left.size().x, 0.0), data, target, event);
     }
 
     fn targeted_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: TargetedEvent) {}
 
-    fn general_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: GeneralEvent) {}
+    fn general_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, event: GeneralEvent) {
+        self.left.general_event(top_left, data, event);
+        self.right.general_event(top_left + graphics::Vector2f::new(self.left.size().x, 0.0), data, event);
+    }
 }

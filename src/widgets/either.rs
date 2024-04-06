@@ -81,5 +81,10 @@ impl<Data, Left: ActualWidget<Data>, Right: ActualWidget<Data>> ActualWidget<Dat
     }
 
     fn targeted_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: TargetedEvent) {}
-    fn general_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: GeneralEvent) {}
+    fn general_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, event: GeneralEvent) {
+        match self {
+            EitherActualWidget::Left(l) => l.general_event(top_left, data, event),
+            EitherActualWidget::Right(r, _) => r.general_event(top_left, data, event),
+        }
+    }
 }

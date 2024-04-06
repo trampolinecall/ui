@@ -1,4 +1,4 @@
-use std::{marker::PhantomData, collections::HashSet};
+use std::{collections::HashSet, marker::PhantomData};
 
 use crate::{
     actual_widget::{ActualWidget, ActualWidgetId, ActualWidgetIdMaker},
@@ -62,5 +62,7 @@ impl<Data, Child: ActualWidget<Data>> ActualWidget<Data> for MaxSizeActualWidget
     }
 
     fn targeted_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: event::TargetedEvent) {}
-    fn general_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: event::GeneralEvent) {}
+    fn general_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, event: event::GeneralEvent) {
+        self.child.general_event(top_left, data, event);
+    }
 }

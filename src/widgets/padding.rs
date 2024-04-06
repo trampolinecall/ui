@@ -85,5 +85,7 @@ impl<Data, Child: ActualWidget<Data>> ActualWidget<Data> for PaddingActualWidget
     }
 
     fn targeted_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: event::TargetedEvent) {}
-    fn general_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: event::GeneralEvent) {}
+    fn general_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, event: event::GeneralEvent) {
+        self.child.general_event(top_left, data, event);
+    }
 }

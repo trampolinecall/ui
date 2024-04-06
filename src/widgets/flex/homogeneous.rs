@@ -111,5 +111,9 @@ impl<Data, Child: ActualWidget<Data>> ActualWidget<Data> for FlexActualWidget<Da
     }
 
     fn targeted_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: TargetedEvent) {}
-    fn general_event(&mut self, _: graphics::Vector2f, _: &mut Data, _: GeneralEvent) {}
+    fn general_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, event: GeneralEvent) {
+        for (_, _, child) in &mut self.children {
+            child.general_event(top_left, data, event);
+        }
+    }
 }
