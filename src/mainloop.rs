@@ -13,16 +13,26 @@ use crate::{
     widgets::Widget,
 };
 
-pub fn run<Model, ModelAsWidget: Widget<Model>>(window_name: &'static str, window_size: (u32, u32), mut model: Model, model_to_widget: impl Fn(&Model) -> ModelAsWidget) {
+pub fn run<Model, ModelAsWidget: Widget<Model>>(
+    window_name: &'static str,
+    window_size: (u32, u32),
+    mut model: Model,
+    model_to_widget: impl Fn(&Model) -> ModelAsWidget,
+) {
     let mut id_maker = ActualWidgetIdMaker::new();
     let graphics_context = {
         let fonts = {
             // TODO: don't panic?
             let text_font_handle = font_kit::source::SystemSource::new()
-                .select_best_match(&[font_kit::family_name::FamilyName::SansSerif, font_kit::family_name::FamilyName::Serif], &font_kit::properties::Properties::new())
+                .select_best_match(
+                    &[font_kit::family_name::FamilyName::SansSerif, font_kit::family_name::FamilyName::Serif],
+                    &font_kit::properties::Properties::new(),
+                )
                 .expect("could not find appropriate text font font");
             let text_font = match text_font_handle {
-                font_kit::handle::Handle::Path { path, font_index: _ } => sfml::graphics::Font::from_file(&path.to_string_lossy()).expect("could not load font"), // TODO: figure out how to handle font_index
+                font_kit::handle::Handle::Path { path, font_index: _ } => {
+                    sfml::graphics::Font::from_file(&path.to_string_lossy()).expect("could not load font")
+                } // TODO: figure out how to handle font_index
                 font_kit::handle::Handle::Memory { bytes: _, font_index: _ } => unimplemented!("loading font from memory"),
             };
 
@@ -30,14 +40,19 @@ pub fn run<Model, ModelAsWidget: Widget<Model>>(window_name: &'static str, windo
                 .select_best_match(&[font_kit::family_name::FamilyName::Monospace], &font_kit::properties::Properties::new())
                 .expect("could not find appropriate monospace font");
             let monospace_font = match monospace_font_handle {
-                font_kit::handle::Handle::Path { path, font_index: _ } => sfml::graphics::Font::from_file(&path.to_string_lossy()).expect("could not load font"), // TODO: figure out how to handle font_index
+                font_kit::handle::Handle::Path { path, font_index: _ } => {
+                    sfml::graphics::Font::from_file(&path.to_string_lossy()).expect("could not load font")
+                } // TODO: figure out how to handle font_index
                 font_kit::handle::Handle::Memory { bytes: _, font_index: _ } => unimplemented!("loading font from memory"),
             };
 
             graphics::Fonts { text_font, monospace_font }
         };
 
-        graphics::GraphicsContext { default_render_context_settings: sfml::window::ContextSettings { antialiasing_level: 0, ..Default::default() }, fonts }
+        graphics::GraphicsContext {
+            default_render_context_settings: sfml::window::ContextSettings { antialiasing_level: 0, ..Default::default() },
+            fonts,
+        }
     };
 
     let mut actual_widget = model_to_widget(&model).to_actual_widget(&mut id_maker);
@@ -65,8 +80,12 @@ pub fn run<Model, ModelAsWidget: Widget<Model>>(window_name: &'static str, windo
                     let hovered: Vec<_> = actual_widget.find_hover(view_top_left, mouse_position).collect();
                     for (hovered, clicks_can_pass_through) in hovered {
                         match button {
-                            sfml::window::mouse::Button::Left => actual_widget.dispatch_event(view_top_left, &mut model, hovered, TargetedEvent::LeftMouseDown(mouse_position)),
-                            sfml::window::mouse::Button::Right => actual_widget.dispatch_event(view_top_left, &mut model, hovered, TargetedEvent::RightMouseDown(mouse_position)),
+                            sfml::window::mouse::Button::Left => {
+                                actual_widget.dispatch_event(view_top_left, &mut model, hovered, TargetedEvent::LeftMouseDown(mouse_position))
+                            }
+                            sfml::window::mouse::Button::Right => {
+                                actual_widget.dispatch_event(view_top_left, &mut model, hovered, TargetedEvent::RightMouseDown(mouse_position))
+                            }
                             _ => {}
                         }
                         if !clicks_can_pass_through {
@@ -75,9 +94,13 @@ pub fn run<Model, ModelAsWidget: Widget<Model>>(window_name: &'static str, windo
                     }
                 }
 
-                sfml::window::Event::MouseMoved { x, y } => actual_widget.general_event(view_top_left, &mut model, GeneralEvent::MouseMoved(graphics::Vector2f::new(x as f32, y as f32))),
+                sfml::window::Event::MouseMoved { x, y } => {
+                    actual_widget.general_event(view_top_left, &mut model, GeneralEvent::MouseMoved(graphics::Vector2f::new(x as f32, y as f32)))
+                }
 
-                sfml::window::Event::MouseButtonReleased { button: sfml::window::mouse::Button::Left, x: _, y: _ } => actual_widget.general_event(view_top_left, &mut model, GeneralEvent::LeftMouseUp),
+                sfml::window::Event::MouseButtonReleased { button: sfml::window::mouse::Button::Left, x: _, y: _ } => {
+                    actual_widget.general_event(view_top_left, &mut model, GeneralEvent::LeftMouseUp)
+                }
                 sfml::window::Event::MouseButtonReleased { button: sfml::window::mouse::Button::Right, x: _, y: _ } => {
                     actual_widget.general_event(view_top_left, &mut model, GeneralEvent::RightMouseUp);
                 }

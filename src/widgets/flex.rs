@@ -19,7 +19,9 @@ pub mod _layout {
     pub fn animated_settings(settings: Animated<ItemSettings>) -> ItemSettings {
         match settings.get() {
             AnimatedValue::Steady(s) => *s,
-            AnimatedValue::Animating { before: ItemSettings::Flex(before_flex), after: ItemSettings::Flex(after_flex), amount } => ItemSettings::Flex(before_flex.lerp(after_flex, amount)),
+            AnimatedValue::Animating { before: ItemSettings::Flex(before_flex), after: ItemSettings::Flex(after_flex), amount } => {
+                ItemSettings::Flex(before_flex.lerp(after_flex, amount))
+            }
             AnimatedValue::Animating { before: _, after, amount: _ } => *after,
         }
     }

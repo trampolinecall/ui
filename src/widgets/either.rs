@@ -1,9 +1,9 @@
-use std::{marker::PhantomData, collections::HashSet};
+use std::{collections::HashSet, marker::PhantomData};
 
 use crate::{
+    actual_widget::{ActualWidget, ActualWidgetId, ActualWidgetIdMaker},
     event::{GeneralEvent, TargetedEvent},
     graphics, layout,
-    actual_widget::{ActualWidget, ActualWidgetId, ActualWidgetIdMaker},
     widgets::Widget,
 };
 
@@ -52,7 +52,13 @@ impl<Data, Left: ActualWidget<Data>, Right: ActualWidget<Data>> ActualWidget<Dat
         }
     }
 
-    fn draw(&self, graphics_context: &graphics::GraphicsContext, target: &mut dyn graphics::RenderTarget, top_left: graphics::Vector2f, hover: &HashSet<ActualWidgetId>) {
+    fn draw(
+        &self,
+        graphics_context: &graphics::GraphicsContext,
+        target: &mut dyn graphics::RenderTarget,
+        top_left: graphics::Vector2f,
+        hover: &HashSet<ActualWidgetId>,
+    ) {
         match self {
             EitherActualWidget::Left(l) => l.draw(graphics_context, target, top_left, hover),
             EitherActualWidget::Right(r, _) => r.draw(graphics_context, target, top_left, hover),

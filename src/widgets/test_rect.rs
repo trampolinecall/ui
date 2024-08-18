@@ -31,7 +31,13 @@ impl<Data> Widget<Data> for TestRect {
     type ActualWidget = TestRectActualWidget;
 
     fn to_actual_widget(self, id_maker: &mut ActualWidgetIdMaker) -> Self::ActualWidget {
-        TestRectActualWidget { color: self.color, ideal_size: self.size, _private: (), layout_size: graphics::Vector2f::new(0.0, 0.0), id: id_maker.next_id() }
+        TestRectActualWidget {
+            color: self.color,
+            ideal_size: self.size,
+            _private: (),
+            layout_size: graphics::Vector2f::new(0.0, 0.0),
+            id: id_maker.next_id(),
+        }
     }
 
     fn update_actual_widget(self, actual_widget: &mut Self::ActualWidget, _: &mut ActualWidgetIdMaker) {
@@ -46,7 +52,13 @@ impl<Data> ActualWidget<Data> for TestRectActualWidget {
         self.layout_size = sc.clamp_size(self.ideal_size);
     }
 
-    fn draw(&self, _: &graphics::GraphicsContext, target: &mut dyn graphics::RenderTarget, top_left: graphics::Vector2f, hover: &HashSet<ActualWidgetId>) {
+    fn draw(
+        &self,
+        _: &graphics::GraphicsContext,
+        target: &mut dyn graphics::RenderTarget,
+        top_left: graphics::Vector2f,
+        hover: &HashSet<ActualWidgetId>,
+    ) {
         let rect = graphics::FloatRect::from_vecs(top_left, self.layout_size);
         let mut rect_shape = graphics::RectangleShape::from_rect(rect);
         rect_shape.set_fill_color(self.color);

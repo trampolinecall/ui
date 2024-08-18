@@ -44,7 +44,11 @@ impl<Data, Child: Widget<Data>> Widget<Data> for Flex<Data, Child> {
     fn to_actual_widget(self, id_maker: &mut ActualWidgetIdMaker) -> Self::ActualWidget {
         FlexActualWidget {
             direction: self.direction,
-            children: self.children.into_iter().map(|(settings, child)| (Animated::new(settings), graphics::Vector2f::new(0.0, 0.0), child.to_actual_widget(id_maker))).collect(),
+            children: self
+                .children
+                .into_iter()
+                .map(|(settings, child)| (Animated::new(settings), graphics::Vector2f::new(0.0, 0.0), child.to_actual_widget(id_maker)))
+                .collect(),
             own_size: graphics::Vector2f::new(0.0, 0.0),
             _phantom: PhantomData,
             _private: (),
@@ -87,10 +91,20 @@ impl<Data, Child: ActualWidget<Data>> ActualWidget<Data> for FlexActualWidget<Da
             phase1_result,
             self.children.iter_mut().map(move |(settings, _, child)| (_layout::animated_settings(*settings), child as &mut dyn ActualWidget<Data>)),
         );
-        self.own_size = _layout::phase3(sc, self.direction, self.children.iter_mut().map(move |(_, offset, child)| (offset, child as &mut dyn ActualWidget<Data>)));
+        self.own_size = _layout::phase3(
+            sc,
+            self.direction,
+            self.children.iter_mut().map(move |(_, offset, child)| (offset, child as &mut dyn ActualWidget<Data>)),
+        );
     }
 
-    fn draw(&self, graphics_context: &graphics::GraphicsContext, target: &mut dyn graphics::RenderTarget, top_left: graphics::Vector2f, hover: &HashSet<ActualWidgetId>) {
+    fn draw(
+        &self,
+        graphics_context: &graphics::GraphicsContext,
+        target: &mut dyn graphics::RenderTarget,
+        top_left: graphics::Vector2f,
+        hover: &HashSet<ActualWidgetId>,
+    ) {
         for (_, offset, child) in &self.children {
             child.draw(graphics_context, target, top_left + *offset, hover);
         }

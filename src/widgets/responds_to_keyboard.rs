@@ -35,7 +35,14 @@ impl<Data, Child: Widget<Data>, Callback: Fn(&mut Data)> Widget<Data> for Respon
     type ActualWidget = RespondsToKeyboardActualWidget<Data, <Child as Widget<Data>>::ActualWidget, Callback>;
 
     fn to_actual_widget(self, id_maker: &mut ActualWidgetIdMaker) -> Self::ActualWidget {
-        RespondsToKeyboardActualWidget { id: id_maker.next_id(), key: self.key, on_press: self.on_press, child: self.child.to_actual_widget(id_maker), _phantom: PhantomData, _private: () }
+        RespondsToKeyboardActualWidget {
+            id: id_maker.next_id(),
+            key: self.key,
+            on_press: self.on_press,
+            child: self.child.to_actual_widget(id_maker),
+            _phantom: PhantomData,
+            _private: (),
+        }
     }
 
     fn update_actual_widget(self, actual_widget: &mut Self::ActualWidget, id_maker: &mut ActualWidgetIdMaker) {
@@ -50,12 +57,22 @@ impl<Data, Child: ActualWidget<Data>, Callback: Fn(&mut Data)> ActualWidget<Data
         self.child.layout(graphics_context, sc);
     }
 
-    fn draw(&self, graphics_context: &graphics::GraphicsContext, target: &mut dyn graphics::RenderTarget, top_left: graphics::Vector2f, hover: &HashSet<ActualWidgetId>) {
+    fn draw(
+        &self,
+        graphics_context: &graphics::GraphicsContext,
+        target: &mut dyn graphics::RenderTarget,
+        top_left: graphics::Vector2f,
+        hover: &HashSet<ActualWidgetId>,
+    ) {
         self.child.draw(graphics_context, target, top_left, hover);
     }
 
     fn find_hover(&self, top_left: graphics::Vector2f, mouse: graphics::Vector2f) -> Box<(dyn Iterator<Item = (ActualWidgetId, bool)> + '_)> {
-        Box::new(if graphics::FloatRect::from_vecs(top_left, self.size()).contains(mouse) { Some((self.id, true)) } else { None }.into_iter().chain(self.child.find_hover(top_left, mouse)))
+        Box::new(
+            if graphics::FloatRect::from_vecs(top_left, self.size()).contains(mouse) { Some((self.id, true)) } else { None }
+                .into_iter()
+                .chain(self.child.find_hover(top_left, mouse)),
+        )
     }
 
     fn size(&self) -> graphics::Vector2f {

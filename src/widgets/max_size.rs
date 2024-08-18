@@ -45,7 +45,13 @@ impl<Data, Child: ActualWidget<Data>> ActualWidget<Data> for MaxSizeActualWidget
         self.child.layout(graphics_context, layout::SizeConstraints { min: sc.min, max: size });
     }
 
-    fn draw(&self, graphics_context: &graphics::GraphicsContext, target: &mut dyn graphics::RenderTarget, top_left: graphics::Vector2f, hover: &HashSet<ActualWidgetId>) {
+    fn draw(
+        &self,
+        graphics_context: &graphics::GraphicsContext,
+        target: &mut dyn graphics::RenderTarget,
+        top_left: graphics::Vector2f,
+        hover: &HashSet<ActualWidgetId>,
+    ) {
         self.child.draw(graphics_context, target, top_left, hover);
     }
 

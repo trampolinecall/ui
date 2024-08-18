@@ -33,7 +33,14 @@ impl<GetFont: Fn(&graphics::Fonts) -> &Font, Data> Widget<Data> for Label<GetFon
     type ActualWidget = LabelActualWidget<GetFont>;
 
     fn to_actual_widget(self, id_maker: &mut ActualWidgetIdMaker) -> Self::ActualWidget {
-        LabelActualWidget { id: id_maker.next_id(), text: self.text, get_font: self.get_font, font_size: self.font_size, size: graphics::Vector2f::new(0.0, 0.0), _private: () }
+        LabelActualWidget {
+            id: id_maker.next_id(),
+            text: self.text,
+            get_font: self.get_font,
+            font_size: self.font_size,
+            size: graphics::Vector2f::new(0.0, 0.0),
+            _private: (),
+        }
     }
 
     fn update_actual_widget(self, actual_widget: &mut Self::ActualWidget, _: &mut ActualWidgetIdMaker) {
@@ -50,7 +57,13 @@ impl<GetFont: Fn(&graphics::Fonts) -> &Font, Data> ActualWidget<Data> for LabelA
         self.size = sc.clamp_size(graphics::Vector2f::new(global_bounds.left + global_bounds.width, global_bounds.top + global_bounds.height));
     }
 
-    fn draw(&self, graphics_context: &graphics::GraphicsContext, target: &mut dyn graphics::RenderTarget, top_left: graphics::Vector2f, _: &HashSet<ActualWidgetId>) {
+    fn draw(
+        &self,
+        graphics_context: &graphics::GraphicsContext,
+        target: &mut dyn graphics::RenderTarget,
+        top_left: graphics::Vector2f,
+        _: &HashSet<ActualWidgetId>,
+    ) {
         // TODO: deal with overflow better than by clipping
         // TODO: also fix messy rendering that is caused by clipping
         util::clip(graphics_context, target, graphics::FloatRect::from_vecs(top_left, self.size), |target, top_left| {

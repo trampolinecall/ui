@@ -7,7 +7,7 @@ pub struct Animated<T> {
     last: Option<T>,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, )]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
 pub(crate) enum AnimatedValue<'t, T> {
     Steady(&'t T),
     Animating { before: &'t T, after: &'t T, amount: f64 },
@@ -39,7 +39,11 @@ impl<T> Animated<T> {
     pub(crate) fn get(&self) -> AnimatedValue<T> {
         if self.last_changed.elapsed() < ANIMATION_DURATION {
             match &self.last {
-                Some(last) => AnimatedValue::Animating { before: last, after: &self.current, amount: ease(self.last_changed.elapsed().as_secs_f64() / ANIMATION_DURATION.as_secs_f64()) },
+                Some(last) => AnimatedValue::Animating {
+                    before: last,
+                    after: &self.current,
+                    amount: ease(self.last_changed.elapsed().as_secs_f64() / ANIMATION_DURATION.as_secs_f64()),
+                },
                 None => AnimatedValue::Steady(&self.current),
             }
         } else {

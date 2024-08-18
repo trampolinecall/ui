@@ -39,8 +39,11 @@ impl<Data, NormalChild: Widget<Data>, ChildOnClicked: Widget<Data>, Callback: Fn
     }
 }
 
-impl<Data, NormalChild: Widget<Data>, ChildOnClicked: Widget<Data>, Callback: Fn(&mut Data)> Widget<Data> for Clickable<Data, NormalChild, ChildOnClicked, Callback> {
-    type ActualWidget = ClickableActualWidget<Data, <NormalChild as Widget<Data>>::ActualWidget, <ChildOnClicked as Widget<Data>>::ActualWidget, Callback>;
+impl<Data, NormalChild: Widget<Data>, ChildOnClicked: Widget<Data>, Callback: Fn(&mut Data)> Widget<Data>
+    for Clickable<Data, NormalChild, ChildOnClicked, Callback>
+{
+    type ActualWidget =
+        ClickableActualWidget<Data, <NormalChild as Widget<Data>>::ActualWidget, <ChildOnClicked as Widget<Data>>::ActualWidget, Callback>;
 
     fn to_actual_widget(self, id_maker: &mut ActualWidgetIdMaker) -> Self::ActualWidget {
         ClickableActualWidget {
@@ -63,13 +66,21 @@ impl<Data, NormalChild: Widget<Data>, ChildOnClicked: Widget<Data>, Callback: Fn
     }
 }
 
-impl<Data, NormalChild: ActualWidget<Data>, ChildOnClicked: ActualWidget<Data>, Callback: Fn(&mut Data)> ActualWidget<Data> for ClickableActualWidget<Data, NormalChild, ChildOnClicked, Callback> {
+impl<Data, NormalChild: ActualWidget<Data>, ChildOnClicked: ActualWidget<Data>, Callback: Fn(&mut Data)> ActualWidget<Data>
+    for ClickableActualWidget<Data, NormalChild, ChildOnClicked, Callback>
+{
     fn layout(&mut self, graphics_context: &graphics::GraphicsContext, sc: layout::SizeConstraints) {
         self.normal_child.layout(graphics_context, sc);
         self.child_on_clicked.layout(graphics_context, sc);
     }
 
-    fn draw(&self, graphics_context: &graphics::GraphicsContext, target: &mut dyn graphics::RenderTarget, top_left: graphics::Vector2f, hover: &HashSet<ActualWidgetId>) {
+    fn draw(
+        &self,
+        graphics_context: &graphics::GraphicsContext,
+        target: &mut dyn graphics::RenderTarget,
+        top_left: graphics::Vector2f,
+        hover: &HashSet<ActualWidgetId>,
+    ) {
         if self.clicked {
             self.child_on_clicked.draw(graphics_context, target, top_left, hover);
         } else {
@@ -78,11 +89,11 @@ impl<Data, NormalChild: ActualWidget<Data>, ChildOnClicked: ActualWidget<Data>, 
     }
 
     fn find_hover(&self, top_left: graphics::Vector2f, mouse: graphics::Vector2f) -> Box<(dyn Iterator<Item = (ActualWidgetId, bool)> + '_)> {
-        Box::new(if graphics::FloatRect::from_vecs(top_left, self.size()).contains(mouse) { Some((self.id, true)) } else { None }.into_iter().chain(if self.clicked {
-            self.child_on_clicked.find_hover(top_left, mouse)
-        } else {
-            self.normal_child.find_hover(top_left, mouse)
-        }))
+        Box::new(
+            if graphics::FloatRect::from_vecs(top_left, self.size()).contains(mouse) { Some((self.id, true)) } else { None }
+                .into_iter()
+                .chain(if self.clicked { self.child_on_clicked.find_hover(top_left, mouse) } else { self.normal_child.find_hover(top_left, mouse) }),
+        )
     }
 
     fn size(&self) -> graphics::Vector2f {

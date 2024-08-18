@@ -34,7 +34,13 @@ impl<Data, Left: Widget<Data>, Right: Widget<Data>> Widget<Data> for VSplit<Data
     type ActualWidget = VSplitActualWidget<Data, <Left as Widget<Data>>::ActualWidget, <Right as Widget<Data>>::ActualWidget>;
 
     fn to_actual_widget(self, id_maker: &mut ActualWidgetIdMaker) -> Self::ActualWidget {
-        VSplitActualWidget { left: self.left.to_actual_widget(id_maker), right: self.right.to_actual_widget(id_maker), size: graphics::Vector2f::new(0.0, 0.0), _phantom: PhantomData, _private: () }
+        VSplitActualWidget {
+            left: self.left.to_actual_widget(id_maker),
+            right: self.right.to_actual_widget(id_maker),
+            size: graphics::Vector2f::new(0.0, 0.0),
+            _phantom: PhantomData,
+            _private: (),
+        }
     }
 
     fn update_actual_widget(self, actual_widget: &mut Self::ActualWidget, id_maker: &mut ActualWidgetIdMaker) {
@@ -44,13 +50,22 @@ impl<Data, Left: Widget<Data>, Right: Widget<Data>> Widget<Data> for VSplit<Data
 }
 impl<Data, Left: ActualWidget<Data>, Right: ActualWidget<Data>> ActualWidget<Data> for VSplitActualWidget<Data, Left, Right> {
     fn layout(&mut self, graphics_context: &graphics::GraphicsContext, sc: layout::SizeConstraints) {
-        let half_sc = layout::SizeConstraints { min: graphics::Vector2f::new(sc.min.x / 2.0, sc.min.y), max: graphics::Vector2f::new(sc.max.x / 2.0, sc.max.y) };
+        let half_sc = layout::SizeConstraints {
+            min: graphics::Vector2f::new(sc.min.x / 2.0, sc.min.y),
+            max: graphics::Vector2f::new(sc.max.x / 2.0, sc.max.y),
+        };
         self.left.layout(graphics_context, half_sc);
         self.right.layout(graphics_context, half_sc);
         self.size = sc.clamp_size(self.left.size() + self.right.size());
     }
 
-    fn draw(&self, graphics_context: &graphics::GraphicsContext, target: &mut dyn graphics::RenderTarget, top_left: graphics::Vector2f, hover: &HashSet<ActualWidgetId>) {
+    fn draw(
+        &self,
+        graphics_context: &graphics::GraphicsContext,
+        target: &mut dyn graphics::RenderTarget,
+        top_left: graphics::Vector2f,
+        hover: &HashSet<ActualWidgetId>,
+    ) {
         self.left.draw(graphics_context, target, top_left, hover);
         self.right.draw(graphics_context, target, top_left + graphics::Vector2f::new(self.left.size().x, 0.0), hover);
     }
@@ -60,7 +75,9 @@ impl<Data, Left: ActualWidget<Data>, Right: ActualWidget<Data>> ActualWidget<Dat
     }
 
     fn find_hover(&self, top_left: graphics::Vector2f, mouse: graphics::Vector2f) -> Box<(dyn Iterator<Item = (ActualWidgetId, bool)> + '_)> {
-        Box::new(self.left.find_hover(top_left, mouse).chain(self.right.find_hover(top_left + graphics::Vector2f::new(self.left.size().x, 0.0), mouse)))
+        Box::new(
+            self.left.find_hover(top_left, mouse).chain(self.right.find_hover(top_left + graphics::Vector2f::new(self.left.size().x, 0.0), mouse)),
+        )
     }
 
     fn dispatch_event(&mut self, top_left: graphics::Vector2f, data: &mut Data, target: ActualWidgetId, event: TargetedEvent) {

@@ -62,12 +62,22 @@ impl<Data, Child: Widget<Data>> Widget<Data> for Padding<Data, Child> {
 
 impl<Data, Child: ActualWidget<Data>> ActualWidget<Data> for PaddingActualWidget<Data, Child> {
     fn layout(&mut self, graphics_context: &graphics::GraphicsContext, sc: layout::SizeConstraints) {
-        let shrunk_sc = sc.shrink(graphics::Vector2f::new(self.left.get_lerped() + self.right.get_lerped(), self.top.get_lerped() + self.bottom.get_lerped()));
+        let shrunk_sc =
+            sc.shrink(graphics::Vector2f::new(self.left.get_lerped() + self.right.get_lerped(), self.top.get_lerped() + self.bottom.get_lerped()));
         self.child.layout(graphics_context, shrunk_sc);
-        self.size = sc.clamp_size(self.child.size() + graphics::Vector2f::new(self.left.get_lerped() + self.right.get_lerped(), self.top.get_lerped() + self.bottom.get_lerped()));
+        self.size = sc.clamp_size(
+            self.child.size()
+                + graphics::Vector2f::new(self.left.get_lerped() + self.right.get_lerped(), self.top.get_lerped() + self.bottom.get_lerped()),
+        );
     }
 
-    fn draw(&self, graphics_context: &graphics::GraphicsContext, target: &mut dyn graphics::RenderTarget, top_left: graphics::Vector2f, hover: &HashSet<ActualWidgetId>) {
+    fn draw(
+        &self,
+        graphics_context: &graphics::GraphicsContext,
+        target: &mut dyn graphics::RenderTarget,
+        top_left: graphics::Vector2f,
+        hover: &HashSet<ActualWidgetId>,
+    ) {
         // TODO: calculate offset better in order to account for cases where the padding must be cut off because it would be too big to fit in the size constraints
         self.child.draw(graphics_context, target, top_left + graphics::Vector2f::new(self.left.get_lerped(), self.top.get_lerped()), hover);
     }

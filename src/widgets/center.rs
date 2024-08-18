@@ -1,8 +1,8 @@
-use std::{marker::PhantomData, collections::HashSet};
+use std::{collections::HashSet, marker::PhantomData};
 
 use crate::{
-    event, graphics, layout,
     actual_widget::{ActualWidget, ActualWidgetId, ActualWidgetIdMaker},
+    event, graphics, layout,
     widgets::Widget,
 };
 
@@ -43,7 +43,13 @@ impl<Data, Child: ActualWidget<Data>> ActualWidget<Data> for CenterActualWidget<
         self.size = sc.max;
     }
 
-    fn draw(&self, graphics_context: &graphics::GraphicsContext, target: &mut dyn graphics::RenderTarget, top_left: graphics::Vector2f, hover: &HashSet<ActualWidgetId>) {
+    fn draw(
+        &self,
+        graphics_context: &graphics::GraphicsContext,
+        target: &mut dyn graphics::RenderTarget,
+        top_left: graphics::Vector2f,
+        hover: &HashSet<ActualWidgetId>,
+    ) {
         self.child.draw(graphics_context, target, center(top_left, self.size, self.child.size()), hover);
     }
 

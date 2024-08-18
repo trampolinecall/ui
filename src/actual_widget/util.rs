@@ -9,8 +9,12 @@ pub(crate) fn clip(
     draw_inner: impl FnOnce(&mut dyn graphics::RenderTarget, graphics::Vector2f),
 ) {
     if rect.width.ceil() != 0.0 && rect.height.ceil() != 0.0 {
-        let mut sub_graphics =
-            graphics::RenderTexture::with_settings(rect.width.ceil() as u32, rect.height.ceil() as u32, &graphics_context.default_render_context_settings).expect("could not create render texture");
+        let mut sub_graphics = graphics::RenderTexture::with_settings(
+            rect.width.ceil() as u32,
+            rect.height.ceil() as u32,
+            &graphics_context.default_render_context_settings,
+        )
+        .expect("could not create render texture");
 
         sub_graphics.set_active(true);
         draw_inner(&mut sub_graphics, graphics::Vector2f::new(0.0, 0.0));
