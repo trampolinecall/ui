@@ -8,7 +8,10 @@ impl Model {
             label4: (ui::widgets::flex::ItemSettings::Fixed, ui::widgets::label::Label::new("boo4".to_string(), ui::Fonts::text_font, 16)),
             label5: (ui::widgets::flex::ItemSettings::Fixed, ui::widgets::label::Label::new("boo5".to_string(), ui::Fonts::text_font, 16)),
             label6: (ui::widgets::flex::ItemSettings::Fixed, ui::widgets::label::Label::new("boo6".to_string(), ui::Fonts::text_font, 16)),
-            label7: (ui::widgets::flex::ItemSettings::Fixed, ui::widgets::label::Label::new("boo7".to_string(), ui::Fonts::text_font, 16)),
+            label7: (
+                ui::widgets::flex::ItemSettings::Flex(2.0),
+                ui::widgets::expand::Expand::new(ui::widgets::label::Label::new("boo7".to_string(), ui::Fonts::text_font, 16))
+            ),
             label8: (
                 ui::widgets::flex::ItemSettings::Flex(2.0),
                 ui::widgets::center::Center::new(ui::widgets::label::Label::new("boo8".to_string(), ui::Fonts::text_font, 16))

@@ -19,7 +19,7 @@ pub struct ExpandActualWidget<Data, Child: ActualWidget<Data>> {
 }
 
 impl<Data, Child: Widget<Data>> Expand<Data, Child> {
-    pub(crate) fn new(child: Child) -> Self {
+    pub fn new(child: Child) -> Self {
         Self { child, _phantom: PhantomData }
     }
 }
